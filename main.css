@@ -1,0 +1,56 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.fields {
+    position: relative;
+    width: 44.2em;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: LightGray;
+    margin-left: auto;
+    margin-right:auto;
+}
+
+.field {
+    width: 4em;
+    height: 4em;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    border-bottom-color: black;
+    border-right-color: black;
+    float: left;
+    margin: 0;
+}
+
+/* Decoration */
+
+.field:nth-child(11n+22) {
+    border-left: 1px solid #ddd;
+    border-left-color: black;
+}
+
+.field:nth-last-child(-n+10) {
+    border-top: 1px solid #ddd;
+    border-top-color: black;
+}
+
+.field:last-child {
+    border-top: 0;
+    border-left: 0;
+    border-left-color: black;
+    border-top-color: black;
+}
+
+.field.middle {
+    background-color: whitesmoke;
+    border-right: 0;
+    border-bottom: 0;
+}
+
