@@ -5,6 +5,21 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Seaside';
+    src: url('SEASRN__.ttf') format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Walkway';
+    src: url('Walkway.ttf') format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -73,4 +88,21 @@ h1.title{
  font-size: 100px;
  color: #7598b4;
 text-align: center;
+}
+
+h1.question{
+    font-family: Lobster;
+    border: none;
+    text-align: left;
+}
+
+i.questionText{
+ font-size: large;
+    font-family: Walkway;
+}
+h2.playerName{
+    text-align: center;
+    text-decoration: underline;
+    font-size: 50px;
+    color: #4A96AD;
 }
