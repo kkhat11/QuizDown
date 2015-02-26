@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Lobster';
+    src: url('Lobster.otf') format("opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -54,3 +61,16 @@
     border-bottom: 0;
 }
 
+.question{
+    border: 2px solid #a1a1a1;
+    padding: 10px 40px; 
+    background: #dddddd;
+    margin-top: 10px;
+}
+
+h1.title{
+ font-family: Lobster;
+ font-size: 100px;
+ color: #7598b4;
+text-align: center;
+}
