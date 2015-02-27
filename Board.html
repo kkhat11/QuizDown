@@ -1,22 +1,40 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="main.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js">
+    </script>
 <script>
     
-var currentPlayer = "player1"; //Must change if multiplayer
-var player1Position = 0;
-var player2Position = 0;
-var player3Position = 0;
-var player4Position = 0;
-
+var mode = "multi";
+var currentPlayer = "player1";
+var player1Position = 1;
+var player2Position = 1;
+var player3Position = 1;
+var player4Position = 1;
 
 $(document).ready(function(){
-    //Include startup script here
-    //Include startup script here
+    determineState();
 });
+
+function determineState(){
+    var url = document.URL;
+    var urlParamaters = [];
+    urlParamaters = url.split('?');
+    if(urlParamaters[1] == "single")
+    {
+        mode = "single";  
+    }
+    else
+    {
+        mode = "multi";
+    }
+}
     
 function updateBoard(){
-    document.getElementById("currentPlayerName").innerHTML = getCurrentPlayer();
+    var playerNumber = currentPlayer[6];
+    var player = "Player " + playerNumber;
+    document.getElementById("currentPlayerName").innerHTML = player;
+    document.getElementById("questionAnswer").value = "";
 }
 function movePlayer()
         {
@@ -29,9 +47,24 @@ function movePlayer()
                                 player1Position = newPosition;
                                 position = "space" + newPosition; 
                                 break;
-                    case "player2": break;
-                    case "player3": break;
-                    case "player4": break;
+                    case "player2":
+                                var newPosition = player2Position + rollDice();
+                                if(newPosition > 40) newPosition -= 40;
+                                player2Position = newPosition;
+                                position = "space" + newPosition; 
+                                break;
+                    case "player3":
+                                var newPosition = player3Position + rollDice();
+                                if(newPosition > 40) newPosition -= 40;
+                                player3Position = newPosition;
+                                position = "space" + newPosition; 
+                    break;
+                    case "player4": 
+                                var newPosition = player4Position + rollDice();
+                                if(newPosition > 40) newPosition -= 40;
+                                player4Position = newPosition;
+                                position = "space" + newPosition; 
+                    break;
                     default: break;
             }
                     
@@ -42,20 +75,58 @@ function movePlayer()
                 playerDivs[i].style.display = "none";
             }
             document.getElementById(position).getElementsByClassName(currentPlayer)[0].style.display = "block";
+            rollDiceDisabled();
+            cyclePlayers();
         }
+function cyclePlayers(){
+ if(mode == "single")
+ {
+     
+ }
+ else if (mode == "multi")
+ {
+    var playerNumber = currentPlayer[6];
+    var number = parseInt(playerNumber);
+    switch(number){
+        case 1: number += 1; break;
+        case 2: number += 1; break;
+        case 3: number += 1; break;
+        case 4: number = 1; break;
+        default: break;
+    }
+    currentPlayer = "player" + number;
+    updateBoard();
+ }   
+}
+    
 function getCurrentPlayer(){
     return currentPlayer;
 }
-    function answerQuestion() {
-        var rightAnswer = "red";
+
+    
+function rollDiceDisabled(){
+     var rollButton = document.getElementById("rollButton");
+    rollButton.disabled = true;
+    rollButton.style.opacity = .1;
+}
+    
+function rollDiceAvailable() {
+    var rollButton = document.getElementById("rollButton");
+    rollButton.disabled = false;
+    rollButton.style.opacity = 1;
+}
+    
+function answerQuestion() {
+        var rightAnswer = "blue";
         var answerSubmitted = document.getElementById("questionAnswer").value;
         if(answerSubmitted == rightAnswer)
-        movePlayer("space2", currentPlayer); //Change this to move to the correct space 
+            rollDiceAvailable();
     
 }
 function rollDice(){
        var x = Math.floor((Math.random() * 6) + 1);
-           
+        string = "You rolled a " + x;
+       document.getElementById("rolledNumber").innerHTML = string;
     return x;
     
 }
@@ -399,14 +470,14 @@ function updateQuestion(){
     </div>
     <div style="float:left; width: 20%; margin-left: 3%;">
         <h1 style="margin-top:10px; text-align: center; color: #4A96AD">Current Player:</h1>
-    <h2 class="playerName" id="currentPlayerName">Player1</h2>
-        <input type="button" style="width:100%; height: 100px; font-size:50px; font-family: Lobster; color: #990033;background-color: #CCCC99;border-color: gray;border-width: 2px;" value="Roll" onClick="movePlayer()">
-   
+    <h2 class="playerName" id="currentPlayerName">Player 1</h2>
+        <input id="rollButton" type="button" style="width:100%; height: 100px; font-size:50px; font-family: Lobster; color: #990033;background-color: #CCCC99;border-color: gray;border-width: 2px; opacity: .1; disabled: True" value="Roll" onClick="movePlayer()">
+   <p id="rolledNumber" style="font-size:Large; font-family: Lobster"></p>
     </div>
     
     <div class="question" id="quizQuestion" style="width:100%; float: left">
         <h1 class="question">Question:</h1>
-            <p><i id="Question" class="questionText">Hello</i></p> 
+            <p><i id="Question" class="questionText">What color is the sky on average?</i></p> 
             <input type="text" id="questionAnswer">
             <input type="button" name="Submit" style="width:auto" value="Submit" onClick="answerQuestion()">
     </div>
