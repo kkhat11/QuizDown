@@ -11,6 +11,8 @@ var player1Position = 1;
 var player2Position = 1;
 var player3Position = 1;
 var player4Position = 1;
+    
+var questionTopics = [["Arts&Literature", false],["Entertainment", false], ["Geography", false], ["History", false], ["Sports", false], ["Science", false]];
 
 var artsAndLiteratureQuestions = [["What nationality was Chopin?", "polish", 0], ["What's the best known artificial international language? ","esperanto", 0], ["Who lived at 221B, Baker Street, London?","sherlock holmes", 0], ["Who cut Van Gogh's ear?","himself", 0], ["What city did Salvador Dali live in?","figueras", 0], ["Who painted the Mona Lisa?","leonardo da vinci", 0], ["What Spanish artist said he would eat his wife when she died?","salvador dali", 0], ["Who wrote Julius Caesar, Macbeth and Hamlet?","william shakespeare", 0], ["Who wrote Lazarillo de Tormes?","anonymous", 0], ["What did the crocodile swallow in Peter Pan?","alarm clock", 0], ["What city was Lope de Vega born?","madrid", 0], ["What are the first three words of the bible?","in the beginning", 0], ["What did the 7 dwarves do for a job?","mining", 0], ["Who painted the Sistine Chapel?","michelangelo", 0], ["Who wrote La Colmena?","cela", 0], ["How many people went onto Noah's Ark?","8", 0], ["What was the name of Don Quixote's horse?","rocinante", 0], ["Who was Robin Hood's girlfriend?","marian", 0], ["Who wrote the James Bond books?","ian fleming", 0], ["Who wrote Dr. Jekyll and Mr. Hyde?","robert louis stevenson", 0], ["Who said, I think, therefore I am?","descartes", 0], ["Who wrote the Ugly Duckling?","hans christian andersen", 0], ["What coutry was El Greco born in?","greece", 0], ["What's the Hungarian word for pepper?","paprika", 0], ["Which painter did the group Mecano write a song about?","salvador dali", 0], ["Who wrote the Satanic Verses?","salman rushdie", 0], ["What was the first theatre play in Spain?","la celestina", 0], ["What's the most important book in the Muslim religion?","quran", 0]]
 
@@ -196,12 +198,20 @@ function updateQuestion(){
     var newQuestion = "New Question Here"; //Change to cycle through questions
     document.getElementById("Question").innerHTML = newQuestion;
 }
-    
+ 
 function setupBoard() {
     closeDialog();
-    //NEEDS TO ACTUALLY READ THE VALUES AND SETUP THE BOARD WITH QUESTIONS
+    getCheckedValues();
 }
 
+function getCheckedValues(){
+    var x = document.getElementById("categorySelection");
+    for(var i = 0; i < 6; i++)
+    {
+        if(x[i].checked)
+            
+    }
+}
 </script>
 <head>
 <link rel="stylesheet" href="main.css">
