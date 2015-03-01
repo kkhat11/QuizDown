@@ -12,10 +12,54 @@ var player2Position = 1;
 var player3Position = 1;
 var player4Position = 1;
 
-$(document).ready(function(){
-    determineState();
-});
 
+$(document).ready(function() { init() })
+
+function init() {
+    $('#overlay').click(function() { closeDialog(); });
+    checkboxlimit(document.forms.categorySelection['category'], 2);
+    openDialog();
+}
+
+function checkboxlimit(checkgroup, limit){
+    for (var i=0; i<checkgroup.length; i++){
+        checkgroup[i].onclick=function(){
+        var checkedcount=0
+        for (var i=0; i<checkgroup.length; i++)
+            checkedcount+=(checkgroup[i].checked)? 1 : 0
+        if (checkedcount>limit){
+            alert("You can check a maximum of "+limit+" boxes.")
+            this.checked=false
+            }
+        }
+    }
+}
+
+
+function openDialog(element) {
+    $('#overlay').css('height', $(document.body).height() + 'px')
+    $('#overlay').show()
+    $('#dialog').html($(element).html())
+    centerMe('#dialog')
+    $('#dialog').show();
+}
+
+function closeDialog() {
+    $('#overlay').hide();
+    $('#dialog').hide().html('');
+}
+
+function centerMe(element) {
+    //pass element name to be centered on screen
+    var pWidth = $(window).width();
+    var pTop = $(window).scrollTop()
+    var eWidth = $(element).width()
+    var height = $(element).height()
+    $(element).css('top', '130px')
+    //$(element).css('top',pTop+100+'px')
+    $(element).css('left', parseInt((pWidth / 2) - (eWidth / 2)) + 'px')
+}
+    
 function determineState(){
     var url = document.URL;
     var urlParamaters = [];
@@ -31,9 +75,12 @@ function determineState(){
 }
     
 function updateBoard(){
-    var playerNumber = currentPlayer[6];
-    var player = "Player " + playerNumber;
-    document.getElementById("currentPlayerName").innerHTML = player;
+    var previousPlayerNumber = parseInt(currentPlayer[6]) - 1;
+    if (previousPlayerNumber == 0) previousPlayerNumber = 4;
+    var previousPlayer = "player" + previousPlayerNumber + "Icon";
+    document.getElementById(previousPlayer).style.width = "20%";
+    var player = currentPlayer + "Icon";
+    document.getElementById(player).style.width = "40%";
     document.getElementById("questionAnswer").value = "";
 }
 function movePlayer()
@@ -138,11 +185,42 @@ function updateQuestion(){
     var newQuestion = "New Question Here"; //Change to cycle through questions
     document.getElementById("Question").innerHTML = newQuestion;
 }
+    
+function setupBoard() {
+    closeDialog();
+    //NEEDS TO ACTUALLY READ THE VALUES AND SETUP THE BOARD WITH QUESTIONS
+}
 
 </script>
 <head>
 <link rel="stylesheet" href="main.css">
 <body bgcolor="#F5F3EE">
+
+<div id="dialog" class="dialog" style="display:none">
+    <h1 style="font-family:Lobster; margin-left:10px; color:#4A96AD">QuizDown</h1>
+    <p style="margin-left:10px; font-family: Walkway">Please select two topics from below:</p>
+    <form id="categorySelection" name="categorySelection">
+        <input type="checkbox" name="category" value="Art&Literature">  Arts & Literature<br><br>
+        <input type="checkbox" name="category" value="Entertainment">   Entertainment<br><br>
+        <input type="checkbox" name="category" value="Geography">   Geography<br><br>
+        <input type="checkbox" name="category" value="History">   History<br><br>
+        <input type="checkbox" name="category" value="Sports">   Sports<br><br>
+        <input type="checkbox" name="category" value="Science">   Science<br><br>
+        </form>
+    <div class="container" style="display:inline-block; padding-left:10px;width:90%">
+    <input type="button" style="width: auto;" value="Create Questions"> 
+    <input type="button" style="width: 100px; float: right; background-color: #4A96AD" value="Submit" onClick="setupBoard()">
+    
+    </div>
+    
+</div>
+<div id="overlay" style="display:none">  
+</div>
+<div id="content" style="display:none">
+</div>
+
+
+    
     <div id="boardDiv" style="display:block; width: 75%; float: left">
     <ul class="fields">
         <li class="field" id="space1">
@@ -470,7 +548,16 @@ function updateQuestion(){
     </div>
     <div style="float:left; width: 20%; margin-left: 3%;">
         <h1 style="margin-top:10px; text-align: center; color: #4A96AD">Current Player:</h1>
-    <h2 class="playerName" id="currentPlayerName">Player 1</h2>
+    <div id="container" style="width:250px">
+        <div id="player1Section" style="display:block">
+        <img id="player1Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="width:40%"><t style="font-family:Lobster">Player 1</t></div><br>
+        <div id="player2Section" style="display:block">
+        <img id="player2Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="width:20%"><t style="font-family:Lobster">Player 2</t></div><br>
+        <div id="player3Section" style="display:block">
+        <img id="player3Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="width:20%"><t style="font-family:Lobster">Player 3</t></div><br>
+        <div id="player4Section" style="display:block">
+        <img id="player4Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="width:20%"><t style="font-family:Lobster">Player 4</t></div> <br> <br>
+        </div>
         <input id="rollButton" type="button" style="width:100%; height: 100px; font-size:50px; font-family: Lobster; color: #990033;background-color: #CCCC99;border-color: gray;border-width: 2px; opacity: .1; disabled: True" value="Roll" onClick="movePlayer()">
    <p id="rolledNumber" style="font-size:Large; font-family: Lobster"></p>
     </div>
