@@ -5,14 +5,15 @@
     </script>
 <script>
     
-var mode = "multi";
+var mode = "single";
 var currentPlayer = "player1";
 var player1Position = 1;
 var player2Position = 1;
 var player3Position = 1;
 var player4Position = 1;
     
-var questionTopics = [["Arts&Literature", false],["Entertainment", false], ["Geography", false], ["History", false], ["Sports", false], ["Science", false]];
+var rolledValue = 0;
+var categoriesPicked = [];
 
 var artsAndLiteratureQuestions = [["What nationality was Chopin?", "polish", 0], ["What's the best known artificial international language? ","esperanto", 0], ["Who lived at 221B, Baker Street, London?","sherlock holmes", 0], ["Who cut Van Gogh's ear?","himself", 0], ["What city did Salvador Dali live in?","figueras", 0], ["Who painted the Mona Lisa?","leonardo da vinci", 0], ["What Spanish artist said he would eat his wife when she died?","salvador dali", 0], ["Who wrote Julius Caesar, Macbeth and Hamlet?","william shakespeare", 0], ["Who wrote Lazarillo de Tormes?","anonymous", 0], ["What did the crocodile swallow in Peter Pan?","alarm clock", 0], ["What city was Lope de Vega born?","madrid", 0], ["What are the first three words of the bible?","in the beginning", 0], ["What did the 7 dwarves do for a job?","mining", 0], ["Who painted the Sistine Chapel?","michelangelo", 0], ["Who wrote La Colmena?","cela", 0], ["How many people went onto Noah's Ark?","8", 0], ["What was the name of Don Quixote's horse?","rocinante", 0], ["Who was Robin Hood's girlfriend?","marian", 0], ["Who wrote the James Bond books?","ian fleming", 0], ["Who wrote Dr. Jekyll and Mr. Hyde?","robert louis stevenson", 0], ["Who said, I think, therefore I am?","descartes", 0], ["Who wrote the Ugly Duckling?","hans christian andersen", 0], ["What coutry was El Greco born in?","greece", 0], ["What's the Hungarian word for pepper?","paprika", 0], ["Which painter did the group Mecano write a song about?","salvador dali", 0], ["Who wrote the Satanic Verses?","salman rushdie", 0], ["What was the first theatre play in Spain?","la celestina", 0], ["What's the most important book in the Muslim religion?","quran", 0]]
 
@@ -26,7 +27,15 @@ var sportsQuestions = [["Who won a gold medal for Spain in cycling in the 1992 O
     
 var scienceQuestions = [["What does the female praying mantis do after she's made love?","sexual cannibalism",0], ["how many colors are there in the rainbow","7",0], ["How many legs has a spider got?","8",0], ["What type of elephant has got the biggest ears?","african",0], ["Who invented the electric light bulb?","thomas edison",0], ["Who invented the telephone?","alexander bell",0], ["Which fingernail grows fastest?","middle",0], ["What temperature in Celsius does water boil at?","100",0], ["Who discovered penicillin?","alexander fleming",0], ["What did Joseph Priesley discover in 1774?","oxygen",0], ["Where is the smallest bone in the body?","ear bone",0], ["Which is the only mammal that can't jump?","elephant",0], ["What does the roman numeral C represent?","100",0], ["What's the smallest type of tree in the world?","bonsai",0], ["Who invented television?","john baird",0], ["Which planet is nearest the sun?","mercury",0], ["What's the hardest rock?","diamond",0], ["How much(in kilograms) does a litre of water weigh?","1",0]];
 
-$(document).ready(function() { init() })
+var categoriesList = [artsAndLiteratureQuestions, entertainmentQuestions, geographyQuestions, historyQuestions, sportsQuestions, scienceQuestions];
+
+var questionPosition;
+var side;
+
+$(document).ready(function() { 
+    init();
+    determineState();
+})
 
 function init() {
     $('#overlay').click(function() { closeDialog(); });
@@ -96,34 +105,48 @@ function updateBoard(){
     document.getElementById(player).style.width = "40%";
     document.getElementById("questionAnswer").value = "";
 }
+    
+
 function movePlayer()
         {
             var position;
             switch(currentPlayer){
                     case "player1":
                                 
-                                var newPosition = player1Position + rollDice();
+                                var newPosition = player1Position + rolledValue;
                                 if(newPosition > 40) newPosition -= 40;
                                 player1Position = newPosition;
-                                position = "space" + newPosition; 
+                                position = "space" + newPosition;
+                                var currentScore = document.getElementById("player1Score").innerHTML;
+                                var newScore = parseInt(currentScore) + rolledValue;
+                                document.getElementById("player1Score").innerHTML = newScore;
                                 break;
                     case "player2":
-                                var newPosition = player2Position + rollDice();
+                                var newPosition = player2Position + rolledValue;
                                 if(newPosition > 40) newPosition -= 40;
                                 player2Position = newPosition;
-                                position = "space" + newPosition; 
+                                position = "space" + newPosition;
+                                var currentScore = document.getElementById("player2Score").innerHTML;
+                                var newScore = parseInt(currentScore) + rolledValue;
+                                document.getElementById("player2Score").innerHTML = newScore;
                                 break;
                     case "player3":
-                                var newPosition = player3Position + rollDice();
+                                var newPosition = player3Position + rolledValue;
                                 if(newPosition > 40) newPosition -= 40;
                                 player3Position = newPosition;
-                                position = "space" + newPosition; 
+                                position = "space" + newPosition;
+                                var currentScore = document.getElementById("player3Score").innerHTML;
+                                var newScore = parseInt(currentScore) + rolledValue;
+                                document.getElementById("player3Score").innerHTML = newScore;
                     break;
                     case "player4": 
-                                var newPosition = player4Position + rollDice();
+                                var newPosition = player4Position + rolledValue;
                                 if(newPosition > 40) newPosition -= 40;
                                 player4Position = newPosition;
-                                position = "space" + newPosition; 
+                                position = "space" + newPosition;
+                                var currentScore = document.getElementById("player4Score").innerHTML;
+                                var newScore = parseInt(currentScore) + rolledValue;
+                                document.getElementById("player4Score").innerHTML = newScore;
                     break;
                     default: break;
             }
@@ -135,13 +158,12 @@ function movePlayer()
                 playerDivs[i].style.display = "none";
             }
             document.getElementById(position).getElementsByClassName(currentPlayer)[0].style.display = "block";
-            rollDiceDisabled();
             cyclePlayers();
         }
 function cyclePlayers(){
  if(mode == "single")
  {
-     
+     document.getElementById("questionAnswer").value = "";
  }
  else if (mode == "multi")
  {
@@ -157,6 +179,7 @@ function cyclePlayers(){
     currentPlayer = "player" + number;
     updateBoard();
  }   
+ rollDiceAvailable();
 }
     
 function getCurrentPlayer(){
@@ -165,43 +188,73 @@ function getCurrentPlayer(){
 
     
 function rollDiceDisabled(){
+    document.getElementById("quizQuestion").style.opacity = 1;
      var rollButton = document.getElementById("rollButton");
     rollButton.disabled = true;
     rollButton.style.opacity = .1;
 }
     
 function rollDiceAvailable() {
+    document.getElementById("quizQuestion").style.opacity = 0;
     var rollButton = document.getElementById("rollButton");
     rollButton.disabled = false;
     rollButton.style.opacity = 1;
 }
     
+    
 function answerQuestion() {
-        var rightAnswer = "blue";
+        var rightAnswer = categoriesList[side][questionPosition][1];
         var answerSubmitted = document.getElementById("questionAnswer").value;
-        if(answerSubmitted == rightAnswer)
-            rollDiceAvailable();
+        if(answerSubmitted.toLowerCase() == rightAnswer.toLowerCase()){
+            document.getElementById("rolledNumber").innerHTML = "CORRECT!";
+            movePlayer();
+        }
+        else
+        {
+            document.getElementById("rolledNumber").innerHTML = "Incorrect! The correct answer is...<br>" + rightAnswer;
+            cyclePlayers();
+        }
     
 }
 function rollDice(){
-       var x = Math.floor((Math.random() * 6) + 1);
-        string = "You rolled a " + x;
+       rolledValue = Math.floor((Math.random() * 6) + 1);
+        string = "You rolled a " + rolledValue + ", Answer the question below!";
        document.getElementById("rolledNumber").innerHTML = string;
-    return x;
-    
-}
-function nextPlayer() {
-    //insert function 
+        rollDiceDisabled();
+        updateQuestion();
 }
 
 function updateQuestion(){
-    var newQuestion = "New Question Here"; //Change to cycle through questions
-    document.getElementById("Question").innerHTML = newQuestion;
+    if(rolledValue % 2 == 0) side = categoriesPicked[0];
+    else side = categoriesPicked[1];
+    var questions = categoriesList[side];
+    var questionsSize = questions.length;
+    questionPosition = Math.floor((Math.random() * questionsSize) + 1);
+    document.getElementById("Question").innerHTML = questions[questionPosition][0];
+}
+
+function setupSingle(){
+        document.getElementById("player1Section").style.display = "block";
+        document.getElementById("player2Section").style.display = "none";
+        document.getElementById("player3Section").style.display = "none";
+        document.getElementById("player4Section").style.display = "none";
+    }
+    
+function setupMulti() {
+        document.getElementById("player1Section").style.display = "block";
+        document.getElementById("player2Section").style.display = "block";
+        document.getElementById("player3Section").style.display = "block";
+        document.getElementById("player4Section").style.display = "block";
+        document.getElementById("space1").getElementsByClassName("player2")[0].style.display = "block";
+        document.getElementById("space1").getElementsByClassName("player3")[0].style.display = "block";
+        document.getElementById("space1").getElementsByClassName("player4")[0].style.display = "block";
 }
  
 function setupBoard() {
-    closeDialog();
+    if(mode == "single") setupSingle()
+    else setupMulti();
     getCheckedValues();
+    closeDialog();
 }
 
 function getCheckedValues(){
@@ -209,7 +262,7 @@ function getCheckedValues(){
     for(var i = 0; i < 6; i++)
     {
         if(x[i].checked)
-            
+            categoriesPicked.push(i);
     }
 }
 </script>
@@ -245,76 +298,76 @@ function getCheckedValues(){
     <div id="boardDiv" style="display:block; width: 75%; float: left">
     <ul class="fields">
         <li class="field" id="space1">
-        <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:block; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:block; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space2">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space3">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space4">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space5">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space6">
-             <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+             <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space7">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space8">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space9">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space10">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space11">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space40">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -326,16 +379,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space12">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space39">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -347,16 +400,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space13">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space38">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -368,16 +421,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space14">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space37">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -389,16 +442,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space15">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space36">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -410,16 +463,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space16">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space35">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -431,16 +484,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space17">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space34">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -452,16 +505,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space18">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space33">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -473,16 +526,16 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space19">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space32">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field middle"></li>
         <li class="field middle"></li>
@@ -494,76 +547,76 @@ function getCheckedValues(){
         <li class="field middle"></li>
         <li class="field middle"></li>
         <li class="field" id="space20">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space31">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space30">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space29">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space28">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space27">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space26">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space25">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space24">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space23">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space22">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
         <li class="field" id="space21">
-           <img class="player1" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/RedGamePiece_zpsaoradxhb.png" style="display:none; height:50%; width:50%; float:left">
-        <img class="player2" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/BlueGamePiece_zpspgdxhqxu.png" style="display:none; height:50%; width:50%; float: left">
-        <img class="player3" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/YellowGamePiece_zps1jjbjxfj.png" style="display:none; height:50%; width: 50%; float: left">
-        <img class="player4" src="http://i76.photobucket.com/albums/j16/Karan_Khatter/GreenGamePiece_zpssfebx0am.png" style="display:none; height:50%; width: 50%; float: left">
+           <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:none; height:50%; width:50%; float:left">
+        <img class="player2" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="display:none; height:50%; width:50%; float: left">
+        <img class="player3" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="display:none; height:50%; width: 50%; float: left">
+        <img class="player4" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="display:none; height:50%; width: 50%; float: left">
         </li>
     </ul>
     </div>
@@ -571,21 +624,36 @@ function getCheckedValues(){
         <h1 style="margin-top:10px; text-align: center; color: #4A96AD">Current Player:</h1>
     <div id="container" style="width:250px">
         <div id="player1Section" style="display:block">
-        <img id="player1Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="width:40%"><t style="font-family:Lobster">Player 1</t></div><br>
+        <img id="player1Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="width:40%">
+        <t style="font-family:Lobster">Player 1</t>
+        Score:
+        <t id="player1Score">0</t></div><br>
         <div id="player2Section" style="display:block">
-        <img id="player2Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="width:20%"><t style="font-family:Lobster">Player 2</t></div><br>
+        <img id="player2Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="width:20%">
+        <t style="font-family:Lobster">Player 2</t>
+        Score:
+        <t id="player2Score">0</t>
+        </div><br>
         <div id="player3Section" style="display:block">
-        <img id="player3Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="width:20%"><t style="font-family:Lobster">Player 3</t></div><br>
+        <img id="player3Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="width:20%">
+        <t style="font-family:Lobster">Player 3</t>
+        Score:
+        <t id="player3Score">0</t>
+        </div><br>
         <div id="player4Section" style="display:block">
-        <img id="player4Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="width:20%"><t style="font-family:Lobster">Player 4</t></div> <br> <br>
+        <img id="player4Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="width:20%">
+        <t style="font-family:Lobster">Player 4</t>
+        Score:
+        <t id="player4Score">0</t>
+        </div> <br> <br>
         </div>
-        <input id="rollButton" type="button" style="width:100%; height: 100px; font-size:50px; font-family: Lobster; color: #990033;background-color: #CCCC99;border-color: gray;border-width: 2px; opacity: .1; disabled: True" value="Roll" onClick="movePlayer()">
+        <input id="rollButton" type="button" style="width:100%; height: 100px; font-size:50px; font-family: Lobster; color: #990033;background-color: #CCCC99;border-color: gray;border-width: 2px; opacity: 1;" value="Roll" onClick="rollDice()">
    <p id="rolledNumber" style="font-size:Large; font-family: Lobster"></p>
     </div>
     
-    <div class="question" id="quizQuestion" style="width:100%; float: left">
+    <div class="question" id="quizQuestion" style="width:100%; float: left; opacity: 0">
         <h1 class="question">Question:</h1>
-            <p><i id="Question" class="questionText">What color is the sky on average?</i></p> 
+            <p><i id="Question" class="questionText">Default</i></p> 
             <input type="text" id="questionAnswer">
             <input type="button" name="Submit" style="width:auto" value="Submit" onClick="answerQuestion()">
     </div>
