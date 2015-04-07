@@ -14,7 +14,8 @@ var player4Position = 1;
     
 var rolledValue = 0;
 var categoriesPicked = [];
-
+var personalQuestionsBoolean = false;
+    
 var artsAndLiteratureQuestions = [["What nationality was Chopin?", "polish", 0], ["What's the best known artificial international language? ","esperanto", 0], ["Who lived at 221B, Baker Street, London?","sherlock holmes", 0], ["Who cut Van Gogh's ear?","himself", 0], ["What city did Salvador Dali live in?","figueras", 0], ["Who painted the Mona Lisa?","leonardo da vinci", 0], ["What Spanish artist said he would eat his wife when she died?","salvador dali", 0], ["Who wrote Julius Caesar, Macbeth and Hamlet?","william shakespeare", 0], ["Who wrote Lazarillo de Tormes?","anonymous", 0], ["What did the crocodile swallow in Peter Pan?","alarm clock", 0], ["What city was Lope de Vega born?","madrid", 0], ["What are the first three words of the bible?","in the beginning", 0], ["What did the 7 dwarves do for a job?","mining", 0], ["Who painted the Sistine Chapel?","michelangelo", 0], ["Who wrote La Colmena?","cela", 0], ["How many people went onto Noah's Ark?","8", 0], ["What was the name of Don Quixote's horse?","rocinante", 0], ["Who was Robin Hood's girlfriend?","marian", 0], ["Who wrote the James Bond books?","ian fleming", 0], ["Who wrote Dr. Jekyll and Mr. Hyde?","robert louis stevenson", 0], ["Who said, I think, therefore I am?","descartes", 0], ["Who wrote the Ugly Duckling?","hans christian andersen", 0], ["What coutry was El Greco born in?","greece", 0], ["What's the Hungarian word for pepper?","paprika", 0], ["Which painter did the group Mecano write a song about?","salvador dali", 0], ["Who wrote the Satanic Verses?","salman rushdie", 0], ["What was the first theatre play in Spain?","la celestina", 0], ["What's the most important book in the Muslim religion?","quran", 0]]
 
 var entertainmentQuestions = [ ["In what year was Elvis' first ever concert?","1954", 0], ["Who sang the song My Way?","frank sinatra", 0], ["Who was the main actor in the movie Cocktail?","tom cruise", 0], ["Who was the main actor in Superman 2?","christoper reeve", 0], ["Who did Madonna marry?","sean penn", 0], ["Who sang the song White Christmas","bing crosby", 0], ["What year did Elvis Presley die?","1977", 0], ["What film star who was in 9 weeks is now a boxer?","mickey rourke", 0], ["Who was the director of the film Psycho?","alfred hitchcock", 0], ["In which city is Hollywood?","los angeles", 0], ["Who did John Lennon marry?","yoko ono", 0], ["Who wrote the song Johnny Be Good","chuck berry", 0], ["What was the first film with sound?","the jazz singer", 0], ["How many oscars did Alfred Hitchcock win?","none", 0], ["Which film about Germany won most prizes in 1976?","cabaret", 0], ["What year did the drummer of Def Lepperd lose his arm?","1984", 0]];
@@ -27,6 +28,8 @@ var sportsQuestions = [["Who won a gold medal for Spain in cycling in the 1992 O
     
 var scienceQuestions = [["What does the female praying mantis do after she's made love?","sexual cannibalism",0], ["how many colors are there in the rainbow","7",0], ["How many legs has a spider got?","8",0], ["What type of elephant has got the biggest ears?","african",0], ["Who invented the electric light bulb?","thomas edison",0], ["Who invented the telephone?","alexander bell",0], ["Which fingernail grows fastest?","middle",0], ["What temperature in Celsius does water boil at?","100",0], ["Who discovered penicillin?","alexander fleming",0], ["What did Joseph Priesley discover in 1774?","oxygen",0], ["Where is the smallest bone in the body?","ear bone",0], ["Which is the only mammal that can't jump?","elephant",0], ["What does the roman numeral C represent?","100",0], ["What's the smallest type of tree in the world?","bonsai",0], ["Who invented television?","john baird",0], ["Which planet is nearest the sun?","mercury",0], ["What's the hardest rock?","diamond",0], ["How much(in kilograms) does a litre of water weigh?","1",0]];
 
+var personalQuestionList = [];
+    
 var categoriesList = [artsAndLiteratureQuestions, entertainmentQuestions, geographyQuestions, historyQuestions, sportsQuestions, scienceQuestions];
 
 var questionPosition;
@@ -38,7 +41,7 @@ $(document).ready(function() {
 })
 
 function init() {
-    $('#overlay').click(function() { closeDialog(); });
+    $('#overlay').click(function() { });
     checkboxlimit(document.forms.categorySelection['category'], 2);
     openDialog();
 }
@@ -70,7 +73,12 @@ function closeDialog() {
     $('#overlay').hide();
     $('#dialog').hide().html('');
 }
-
+    
+function closeQuestionDialog() {
+    $('#overlay').hide();
+    $('#personalQuestion').hide().html('');
+}
+    
 function centerMe(element) {
     //pass element name to be centered on screen
     var pWidth = $(window).width();
@@ -95,7 +103,16 @@ function determineState(){
         mode = "multi";
     }
 }
-    
+
+function personalQuestions() {
+    closeDialog()
+    personalQuestionsBoolean = true;
+    $('#overlay').css('height', $(document.body).height() + 'px')
+    $('#overlay').show()
+    centerMe('#personalQuestion')
+    $('#personalQuestion').show();
+}
+
 function updateBoard(){
     var previousPlayerNumber = parseInt(currentPlayer[6]) - 1;
     if (previousPlayerNumber == 0) previousPlayerNumber = 4;
@@ -203,7 +220,12 @@ function rollDiceAvailable() {
     
     
 function answerQuestion() {
-        var rightAnswer = categoriesList[side][questionPosition][1];
+    var rightAnswer;    
+    if(personalQuestionsBoolean){
+            rightAnswer = personalQuestionList[questionPosition][1];
+    } else {
+            rightAnswer = categoriesList[side][questionPosition][1];
+    }
         var answerSubmitted = document.getElementById("questionAnswer").value;
         if(answerSubmitted.toLowerCase() == rightAnswer.toLowerCase()){
             document.getElementById("rolledNumber").innerHTML = "CORRECT!";
@@ -225,12 +247,19 @@ function rollDice(){
 }
 
 function updateQuestion(){
+    if(personalQuestionsBoolean){
+        var listSize = personalQuestionList.length;
+        questionPosition = Math.floor((Math.random() * listSize));
+        document.getElementById("Question").innerHTML = personalQuestionList[questionPosition][0];
+    }
+    else{
     if(rolledValue % 2 == 0) side = categoriesPicked[0];
     else side = categoriesPicked[1];
     var questions = categoriesList[side];
     var questionsSize = questions.length;
     questionPosition = Math.floor((Math.random() * questionsSize));
     document.getElementById("Question").innerHTML = questions[questionPosition][0];
+    }
 }
 
 function setupSingle(){
@@ -253,8 +282,13 @@ function setupMulti() {
 function setupBoard() {
     if(mode == "single") setupSingle()
     else setupMulti();
-    getCheckedValues();
-    closeDialog();
+    if(personalQuestionsBoolean){
+        closeQuestionDialog();
+    } else {
+        getCheckedValues();
+        closeDialog();  
+    }
+        
 }
 
 function getCheckedValues(){
@@ -264,6 +298,24 @@ function getCheckedValues(){
         if(x[i].checked)
             categoriesPicked.push(i);
     }
+}
+
+function completePersonalQuestions() {
+    if(document.getElementById("personalQuestionQuestion").value != "" || document.getElementById("personalQuestionAnswer").value != ""){
+         document.getElementById("newQuestionStatus").innerHTML = "Please add question first...";
+    } else {
+        setupBoard();
+    }
+}
+    
+function moreQuestions() {
+   var question = document.getElementById("personalQuestionQuestion").value;
+    var answer = document.getElementById("personalQuestionAnswer").value;
+    personalQuestionList.push([question, answer]);
+    document.getElementById("personalQuestionQuestion").value = "";
+    document.getElementById("personalQuestionAnswer").value = "";
+    document.getElementById("newQuestionStatus").innerHTML = "Question " + personalQuestionList.length + " added";
+    
 }
 </script>
 <head>
@@ -282,12 +334,25 @@ function getCheckedValues(){
         <input type="checkbox" name="category" value="Science">   Science<br><br>
         </form>
     <div class="container" style="display:inline-block; padding-left:10px;width:90%">
-    <input type="button" style="width: auto;" value="Create Questions"> 
+    <input type="button" style="width: auto;" value="Create Questions" onClick="personalQuestions()"> 
     <input type="button" style="width: 100px; float: right; background-color: #4A96AD" value="Submit" onClick="setupBoard()">
     
     </div>
     
 </div>
+<div id="personalQuestion" class="questions" style="display:none; margin-left:10px;">
+    <h2 style="font-family:Lobster; margin-left:10px; color:#4A96AD">Please type question below:</h2>
+    <p style="margin-left:10px">Please enter your question:</p><br>
+    <input id="personalQuestionQuestion" type="text" name="question" style="margin-left:10px; width:85%"><br>
+    <p style="margin-left:10px">Please enter the answer:</p><br>
+    <input id="personalQuestionAnswer" type="text" name="answer" style="margin-left:10px; width: 85%"><br><br><br>
+    <div id="personalQuestionButtons" style="margin-left:10px">
+        <input type="button" value="Add question" onClick="moreQuestions()">
+        <input type="button" value="Complete" onClick="completePersonalQuestions()">
+    
+    </div>
+    <p id="newQuestionStatus" style="margin-left:10px; font-family: Lobster;color:#4A96AD"></p>
+    </div>
 <div id="overlay" style="display:none">  
 </div>
 <div id="content" style="display:none">

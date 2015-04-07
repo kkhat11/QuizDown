@@ -138,3 +138,12 @@ html, body {
     margin-left:10px;
     border-radius: 25px;
 }
+.questions {
+    position:absolute;
+    border:1px solid Gray;
+    width:300px;
+    height:400px;
+    background-color:#ffffff;
+    z-index:12;
+    margin-left:10px;
+    borde
