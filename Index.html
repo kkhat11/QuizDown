@@ -1,21 +1,60 @@
 <!DOCTYPE html>
 <html>
     <link rel="stylesheet" href="main.css">
-<script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
 function singlePlayer(){
     window.location.href= "Board.html?single"   
 }
 function multiPlayer(){
-    window.location.href= "Board.html?multi"   
+    window.location.href= "Board.html?multi?qty=" + document.getElementById("qty").value;   
+}
+
+function loading(gameType){
+ var over = '<div id="overlay">' +
+            '<img id="loading" src="Images/loading.gif" style="position:fixed; top:40%; left:45%;">'
+            + '<p id="loadingText" class="regularText" style="color:White;top: 50%;left: 46%;position: fixed;font-family:Lobster; font-size:X-large;">Creating game...</p>'
+            + '</div>';
+        $(over).appendTo('body');   
+    if(gameType == "single")    
+        setTimeout(singlePlayer, 4000);
+    else
+        setTimeout(multiPlayer, 4000);  
+}
+function increaseQty() {
+    var value = parseInt(document.getElementById("qty").value);
+    if(value < 4){
+        var newValue = value + 1;
+        document.getElementById("qty").value = newValue;
+    }
+}
+function decreaseQty() {
+    var value = parseInt(document.getElementById("qty").value);
+    if(value > 2){
+        var newValue = value - 1;
+        document.getElementById("qty").value = newValue;
+    }
 }
 </script>
-    <body>
+    <body class="index-body">
         <h1 class="title">QuizDown</h1>
         <div style="text-align:center;">
-        <input type="button" value="Single Player" style="width:35%;height:5%; font-size:Large" onclick="singlePlayer()"><br><br>
-        <input type="button" value="Multi Player" style="width:35%; height:5%;font-size:Large" onclick="multiPlayer()">
-        </div>
         
+        <ul>
+            <li><a class="round green" onclick="loading('single')">Single<span class="round">Answer the trivia questions by yourself! Can you do it?</span></a></li>
+	       <li><a href="#" class="round yellow" onclick="loading('multi')">Multi<span class="round">Play against friend(s)! Select the number of players.</span></a></li>
+            <li><p style="font-family: lobster; color: #7598b4; text-align:center;"># of players:</p><form id='myform' method='POST' action='#'>
+            <input type='button' value='-' field='quantity' onclick="decreaseQty()" />
+            <input id="qty" type='text' name='quantity' value='2' style="width:20%; text-align: center;"/>
+            <input type='button' value='+'  field='quantity' onclick="increaseQty()"/>
+        </form></li>
+            </ul>  
+            
+            
+            <!--<input type="button" value="Single Player" style="width:35%;height:5%; font-size:Large" onclick="singlePlayer()"><br><br>
+        <input type="button" value="Multi Player" style="width:35%; height:5%;font-size:Large" onclick="multiPlayer()">-->
+        
+        </div>
         
     </body>
 </html>

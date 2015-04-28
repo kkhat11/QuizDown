@@ -6,12 +6,13 @@
 <script>
     
 var mode = "single";
+var numberOfPlayers = 1;
 var currentPlayer = "player1";
 var player1Position = 1;
 var player2Position = 1;
 var player3Position = 1;
 var player4Position = 1;
-    
+
 var rolledValue = 0;
 var categoriesPicked = [];
 var personalQuestionsBoolean = false;
@@ -114,8 +115,9 @@ function personalQuestions() {
 }
 
 function updateBoard(){
+    document.getElementById("rolledNumber").innerHTML = "";
     var previousPlayerNumber = parseInt(currentPlayer[6]) - 1;
-    if (previousPlayerNumber == 0) previousPlayerNumber = 4;
+    if (previousPlayerNumber == 0) previousPlayerNumber = numberOfPlayers;
     var previousPlayer = "player" + previousPlayerNumber + "Icon";
     document.getElementById(previousPlayer).style.width = "20%";
     var player = currentPlayer + "Icon";
@@ -181,18 +183,14 @@ function cyclePlayers(){
  if(mode == "single")
  {
      document.getElementById("questionAnswer").value = "";
+    document.getElementById("rolledNumber").innerHTML = "";
  }
  else if (mode == "multi")
  {
     var playerNumber = currentPlayer[6];
     var number = parseInt(playerNumber);
-    switch(number){
-        case 1: number += 1; break;
-        case 2: number += 1; break;
-        case 3: number += 1; break;
-        case 4: number = 1; break;
-        default: break;
-    }
+    if(number < numberOfPlayers) number++;
+    else if(number == numberOfPlayers) number = 1;
     currentPlayer = "player" + number;
     updateBoard();
  }   
@@ -218,7 +216,10 @@ function rollDiceAvailable() {
     rollButton.style.opacity = 1;
 }
     
-    
+function flipCard() {
+    document.getElementById("quizQuestion").classList.toggle("flip");
+   
+}
 function answerQuestion() {
     var rightAnswer;    
     if(personalQuestionsBoolean){
@@ -228,19 +229,23 @@ function answerQuestion() {
     }
         var answerSubmitted = document.getElementById("questionAnswer").value;
         if(answerSubmitted.toLowerCase() == rightAnswer.toLowerCase()){
-            document.getElementById("rolledNumber").innerHTML = "CORRECT!";
-            movePlayer();
+            document.getElementById("correctAnswer").innerHTML = "CORRECT!";
+            flipCard();
+            setTimeout(flipCard, 2000);
+            setTimeout(movePlayer, 2000);
         }
         else
         {
-            document.getElementById("rolledNumber").innerHTML = "Incorrect! The correct answer is...<br>" + rightAnswer;
-            cyclePlayers();
+            document.getElementById("correctAnswer").innerHTML = "Incorrect!<br> The correct answer is..." + rightAnswer;
+            flipCard();
+            setTimeout(flipCard, 3000);
+            setTimeout(cyclePlayers, 3000);
         }
     
 }
 function rollDice(){
        rolledValue = Math.floor((Math.random() * 6) + 1);
-        string = "You rolled a " + rolledValue + ", Answer the question below!";
+        string = "You rolled a <br><span style='font-size:50px'>" + rolledValue + "</span><br> Answer the question on the card!";
        document.getElementById("rolledNumber").innerHTML = string;
         rollDiceDisabled();
         updateQuestion();
@@ -253,8 +258,11 @@ function updateQuestion(){
         document.getElementById("Question").innerHTML = personalQuestionList[questionPosition][0];
     }
     else{
-    if(rolledValue % 2 == 0) side = categoriesPicked[0];
-    else side = categoriesPicked[1];
+    if(categoriesPicked.length > 1){
+        if(rolledValue % 2 == 0) side = categoriesPicked[0];
+        else side = categoriesPicked[1];
+    }
+        else side = 0;
     var questions = categoriesList[side];
     var questionsSize = questions.length;
     questionPosition = Math.floor((Math.random() * questionsSize));
@@ -270,13 +278,44 @@ function setupSingle(){
     }
     
 function setupMulti() {
-        document.getElementById("player1Section").style.display = "block";
-        document.getElementById("player2Section").style.display = "block";
-        document.getElementById("player3Section").style.display = "block";
-        document.getElementById("player4Section").style.display = "block";
-        document.getElementById("space1").getElementsByClassName("player2")[0].style.display = "block";
-        document.getElementById("space1").getElementsByClassName("player3")[0].style.display = "block";
-        document.getElementById("space1").getElementsByClassName("player4")[0].style.display = "block";
+        var url = document.URL;
+        var urlParamaters= [];
+        urlParamaters= url.split('qty=');
+        numberOfPlayers = urlParamaters[1];
+        switch(numberOfPlayers) {
+                case "2": {
+                    document.getElementById("player1Section").style.display = "block";
+                    document.getElementById("player2Section").style.display = "block";
+                    document.getElementById("space1").getElementsByClassName("player2")[0].style.display = "block";
+                    document.getElementById("player3Section").style.display = "none";
+                    document.getElementById("player4Section").style.display = "none";
+                    break;
+                }
+                case "3": {
+                    document.getElementById("player1Section").style.display = "block";
+                    document.getElementById("player2Section").style.display = "block";
+                    document.getElementById("player3Section").style.display = "block";
+                    document.getElementById("space1").getElementsByClassName("player2")[0].style.display = "block";
+                    document.getElementById("space1").getElementsByClassName("player3")[0].style.display = "block";
+                    document.getElementById("player4Section").style.display = "none";
+                    break;
+                }
+                case "4": {
+                    document.getElementById("player1Section").style.display = "block";
+                    document.getElementById("player2Section").style.display = "block";
+                    document.getElementById("player3Section").style.display = "block";
+                    document.getElementById("player4Section").style.display = "block";
+                    document.getElementById("space1").getElementsByClassName("player2")[0].style.display = "block";
+                    document.getElementById("space1").getElementsByClassName("player3")[0].style.display = "block";
+                    document.getElementById("space1").getElementsByClassName("player4")[0].style.display = "block";
+                    break;
+                }
+                default: break;
+                
+                
+                
+                
+        }
 }
  
 function setupBoard() {
@@ -320,8 +359,7 @@ function moreQuestions() {
 </script>
 <head>
 <link rel="stylesheet" href="main.css">
-<body bgcolor="#F5F3EE">
-
+<body class="boardClass">
 <div id="dialog" class="dialog" style="display:none">
     <h1 style="font-family:Lobster; margin-left:10px; color:#4A96AD">QuizDown</h1>
     <p style="margin-left:10px; font-family: Walkway">Please select two topics from below:</p>
@@ -360,7 +398,7 @@ function moreQuestions() {
 
 
     
-    <div id="boardDiv" style="display:block; width: 75%; float: left">
+    <div id="boardDiv" style="display:block; width: 75%; float: left;height: 100%;padding-top: 8%;padding-left: 20%;">
     <ul class="fields">
         <li class="field" id="space1">
         <img class="player1" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="display:block; height:50%; width:50%; float:left">
@@ -685,45 +723,56 @@ function moreQuestions() {
         </li>
     </ul>
     </div>
-    <div style="float:left; width: 20%; margin-left: 3%;">
-        <h1 style="margin-top:10px; text-align: center; color: #4A96AD">Current Player:</h1>
+    <div style="float:left; width: 20%; margin-left: 3%; height: 100%">
+        <h1 style="margin-top:10px; text-align: center; color: White ; font-family: Lobster">Current Player:</h1>
     <div id="container" style="width:250px">
         <div id="player1Section" style="display:block">
         <img id="player1Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="width:40%">
-        <t style="font-family:Lobster">Player 1</t>
-        Score:
-        <t id="player1Score">0</t></div><br>
+        <t style="font-family:Lobster;color:white">Player 1</t>
+        <span style="color:white">Score:</span>
+        <t id="player1Score" style="color:white">0</t></div><br>
         <div id="player2Section" style="display:block">
         <img id="player2Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png" style="width:20%">
-        <t style="font-family:Lobster">Player 2</t>
-        Score:
-        <t id="player2Score">0</t>
+        <t style="font-family:Lobster;color:white">Player 2</t>
+        <span style="color:white">Score:</span>
+        <t id="player2Score" style="color:white">0</t>
         </div><br>
         <div id="player3Section" style="display:block">
         <img id="player3Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png" style="width:20%">
-        <t style="font-family:Lobster">Player 3</t>
-        Score:
-        <t id="player3Score">0</t>
+        <t style="font-family:Lobster;color:white">Player 3</t>
+        <span style="color:white">Score:</span>
+        <t id="player3Score" style="color:white">0</t>
         </div><br>
         <div id="player4Section" style="display:block">
         <img id="player4Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png" style="width:20%">
-        <t style="font-family:Lobster">Player 4</t>
-        Score:
-        <t id="player4Score">0</t>
+        <t style="font-family:Lobster;color:white">Player 4</t>
+        <span style="color:white">Score:</span>
+        <t id="player4Score" style="color:white">0</t>
         </div> <br> <br>
         </div>
-        <input id="rollButton" type="button" style="width:100%; height: 100px; font-size:50px; font-family: Lobster; color: #990033;background-color: #CCCC99;border-color: gray;border-width: 2px; opacity: 1;" value="Roll" onClick="rollDice()">
-   <p id="rolledNumber" style="font-size:Large; font-family: Lobster"></p>
+        <input type="button" id="rollButton" class="action-button shadow animate blue" onClick="rollDice()" value="Roll Dice">
+        <p id="rolledNumber" style="font-size:Large; font-family: Lobster; color:white; float:left"></p>
     </div>
     
-    <div class="question" id="quizQuestion" style="width:100%; float: left; opacity: 0">
-        <h1 class="question">Question:</h1>
-            <p><i id="Question" class="questionText">Default</i></p> 
-            <input type="text" id="questionAnswer">
-            <input type="button" name="Submit" style="width:auto" value="Submit" onClick="answerQuestion()">
-    </div>
-    <br>
-    <input type="button" name="MainMenu" onClick="window.location.href = 'Index.html'" style="width:auto; float:left" value="Go To Main Menu">
+    <div id="quizQuestion" class="flip-container" ontouchstart="this.classList.toggle('hover');" style="opacity:0; margin-left: 37%;padding-top: 13%;">
+	<div class="flipper">
+		<div class="front">
+			<div class="question" id="questionDiv">
+                <h1 class="question">Question:</h1>
+                <i id="Question" class="questionText">default</i>
+                <br>
+                <br>
+                <input type="text" id="questionAnswer">
+                <input type="button" name="Submit" style="width:auto" value="Submit"                            onClick="answerQuestion()"></div>
+		</div>
+		<div class="back">
+			<div class="question"><p id="correctAnswer" style="font-family:Walkway; font-size: 150%;">Default</p> </div>
+		</div>
+	</div>
+</div>
+            
+            
+    <div class="greenDiv" style="width:100px; height:100px;position: absolute;bottom: 0px;left: 0px;margin-left: 45px; margin-bottom: 50px;"><a class="round realGreen" href="Index.html">Home<span class="round">Go back to the main menu!</span></a></div>
     </body>
 </head>
 </html>
