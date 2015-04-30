@@ -286,7 +286,16 @@ li {
 	a.realGreen:hover {
 		color: rgba(130,191,86,1);
 	}
+    
+    a.red {
+		background-color: rgba(239,57,50,1);
+		color: rgba(133,32,28,1);
+		border-color: rgba(133,32,28,.2);
+	}
 
+	a.red:hover {
+		color: rgba(239,57,50,1);
+	}
 
 	.round span.round {
 		display: block;
@@ -322,6 +331,10 @@ li {
     .realGreen span {
 		background: rgba(88,130,59,.7);	
 
+	}
+    
+    .red span {
+		background: rgba(133,32,28,.7);		
 	}
 
 
@@ -400,4 +413,21 @@ li {
 /* back, initially hidden pane */
 .back {
 	transform: rotateY(180deg);
+}
+
+#foo {
+    position: fixed;
+    right: 0;
+    left: 0;
+    top:0;
+    bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:auto;
+    margin-bottom:auto;
+    width: 0%;
+    height: 0%;
+    background: url(http://i288.photobucket.com/albums/ll190/melkor_666/Gambit_animated_water_zpsfe2e96c5.gif);
+    border-radius: 25px;
+    border: 10px solid #004080;
 }

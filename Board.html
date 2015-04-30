@@ -39,14 +39,98 @@ var side;
 $(document).ready(function() { 
     init();
     determineState();
+    gameAlert();
 })
+function gameAlert() {
+$("#player1Score").bind("DOMSubtreeModified",function(){
+  if(parseInt(document.getElementById('player1Score').innerHTML) >= 50) gameOver("player1");
+});
 
+$("#player2Score").bind("DOMSubtreeModified",function(){
+  if(parseInt(document.getElementById('player2Score').innerHTML) >= 50) gameOver("player2");
+});
+
+$("#player3Score").bind("DOMSubtreeModified",function(){
+  if(parseInt(document.getElementById('player3Score').innerHTML) >= 50) gameOver("player3");
+});
+
+$("#player4Score").bind("DOMSubtreeModified",function(){
+  if(parseInt(document.getElementById('player4Score').innerHTML) >= 50) gameOver("player4");
+});
+}
 function init() {
     $('#overlay').click(function() { });
-    checkboxlimit(document.forms.categorySelection['category'], 2);
+    checkboxlimit(document.forms.categorySelection['category'], 2);    
     openDialog();
 }
 
+function endGame() {
+    var winnerScore = 0;
+    var winnerPlayer = "";
+    if(parseInt(document.getElementById("player1Score").innerHTML) > winnerScore){
+        winnerPlayer = "player1";
+        winnerScore = parseInt(document.getElementById("player1Score").innerHTML);
+    }
+    if(parseInt(document.getElementById("player2Score").innerHTML) > winnerScore){
+        winnerPlayer = "player2";
+        winnerScore = parseInt(document.getElementById("player2Score").innerHTML);
+    }
+    if(parseInt(document.getElementById("player3Score").innerHTML) > winnerScore){
+        winnerPlayer = "player3";
+        winnerScore = parseInt(document.getElementById("player3Score").innerHTML);
+    }
+    if(parseInt(document.getElementById("player4Score").innerHTML) > winnerScore){
+        winnerPlayer = "player4";
+        winnerScore = parseInt(document.getElementById("player4Score").innerHTML);
+    }
+                               
+    
+    gameOver(winnerPlayer);
+}
+    
+function gameOver(player) {
+    var image = "";
+    var playerNumber = player[6];
+    switch(player) {
+        case "player1": image = "http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png"; break;
+        case "player2": image = "http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/turtle-icon.png"; break;
+        case "player3": image = "http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/crab-icon.png"; break;
+        case "player4": image = "http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/dolphin-icon.png"; break;
+            
+    }
+    var over = '<div id="overlay">' +
+            '<div id="foo" style="display: block;text-align:           center;border-color: black;">'
+	       + '<img src="'+ image + '" style="width:auto; height: cover; ">'
+  	         + '<h1 style="display:block;font-family: Lobster;color: white;">Player' + playerNumber+ ' wins!!</h1>'
+    + '<div class="greenDiv" style="width:100px; height:100px;display:block;margin-left:35%;"><a class="round realGreen" href="Index.html">Home<span class="round">Go back to the main menu!</span></a></div>'
+            + '</div>'
+            + '</div>';
+        $(over).appendTo('body'); 
+    grow(0);
+    
+}
+
+
+var $foo = $('#foo');
+grow = function(size)
+    {
+        if (size < 45) {
+        var height = document.getElementById("foo").style.height;
+        var width = document.getElementById("foo").style.width;
+        if(height == ""){ height = "0%"; width = "0%";}
+        var heightInt = parseInt(height.substring(0, height.length - 1));
+        var widthInt = parseInt(width.substring(0, width.length - 1));
+        heightInt++;
+        if(widthInt <=25)widthInt ++;
+        document.getElementById("foo").style.height = heightInt.toString() + "%";
+        document.getElementById("foo").style.width = widthInt.toString() + "%";
+        size++;
+        setTimeout(grow, 10, size);
+    }
+    
+    }
+
+    
 function checkboxlimit(checkgroup, limit){
     for (var i=0; i<checkgroup.length; i++){
         checkgroup[i].onclick=function(){
@@ -61,7 +145,7 @@ function checkboxlimit(checkgroup, limit){
     }
 }
 
-
+    
 function openDialog(element) {
     $('#overlay').css('height', $(document.body).height() + 'px')
     $('#overlay').show()
@@ -124,7 +208,8 @@ function updateBoard(){
     document.getElementById(player).style.width = "40%";
     document.getElementById("questionAnswer").value = "";
 }
-    
+
+
 
 function movePlayer()
         {
@@ -724,8 +809,8 @@ function moreQuestions() {
     </ul>
     </div>
     <div style="float:left; width: 20%; margin-left: 3%; height: 100%">
-        <h1 style="margin-top:10px; text-align: center; color: White ; font-family: Lobster">Current Player:</h1>
-    <div id="container" style="width:250px">
+        <h1 style="margin-top:10px; text-align: left; color: White ; font-family: Lobster">Current Player:</h1>
+    <div id="container" style="width:250px;height: auto;background: tan;border: #2e1a12 solid 10px;-moz-border-image: url(wood.png) 200 stretch;border-image: url(http://pixabay.com/static/uploads/photo/2014/07/31/22/13/coconut-tree-407003_640.jpg) 200 stretch;">
         <div id="player1Section" style="display:block">
         <img id="player1Icon" src="http://icons.iconarchive.com/icons/martin-berube/flat-animal/256/octopus-icon.png" style="width:40%">
         <t style="font-family:Lobster;color:white">Player 1</t>
@@ -750,6 +835,7 @@ function moreQuestions() {
         <t id="player4Score" style="color:white">0</t>
         </div> <br> <br>
         </div>
+        <br>
         <input type="button" id="rollButton" class="action-button shadow animate blue" onClick="rollDice()" value="Roll Dice">
         <p id="rolledNumber" style="font-size:Large; font-family: Lobster; color:white; float:left"></p>
     </div>
@@ -772,7 +858,9 @@ function moreQuestions() {
 </div>
             
             
-    <div class="greenDiv" style="width:100px; height:100px;position: absolute;bottom: 0px;left: 0px;margin-left: 45px; margin-bottom: 50px;"><a class="round realGreen" href="Index.html">Home<span class="round">Go back to the main menu!</span></a></div>
+    <div class="greenDiv" style="width:100px; height:100px;position: absolute;bottom: 0px;left: 0px;margin-left: 3%; margin-bottom: 3%;"><a class="round realGreen" href="Index.html">Home<span class="round">Go back to the main menu!</span></a></div>
+    <div class="red" style="width:100px; height:100px;position: absolute;bottom: 0px;left: 0px;margin-left: 11%; margin-bottom: 3%;"><a class="round red" onClick="endGame()">End<span class="round">End the game</span></a></div>
+    
     </body>
 </head>
 </html>
